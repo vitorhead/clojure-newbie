@@ -2,7 +2,9 @@
     (:require [clojure.java.jdbc :as sql]
               [clojure.string :as str]
               [clj-time.coerce :as timec]
-              [clj-time.format :as timef]))
+              [clj-time.format :as timef]
+              [clj-time.core :as timecore]))
+          
 
 ; Timestamp conversions
 ; These function can be used to convert a string into a timestamp and then insert it on the db
@@ -23,7 +25,7 @@
                  :user ""
                  :password ""
                  :ssl true
-                 :sslfactory ""})                              
+                 :sslfactory ""})                                  
 
 ; ==               
 ; Users table
@@ -34,11 +36,13 @@
                    :name identity, 
                    :createdat timestamp-to-string})
 
-; (db/create-user {:name "teste lein" :email "foo@bar.foo" :createdat (db/string-to-timestamp "2018-06-02 20:13:00")})
 (defn create-user 
     [user]
-    (sql/insert! postgresql
-                 :users user))
+    (let [parsed-user (into user 
+                            {:createdat (timec/to-timestamp (timecore/now))}
+                            )]
+        (sql/insert! postgresql
+                     :users parsed-user)))
            
 (defn get-all-users []
     (into [] 
@@ -65,11 +69,13 @@
 ; Accounts table
 ; ==
 
-; (db/create-account {:iduser 3 :balance 100.0 :createdat (db/string-to-timestamp "2018-06-03 14:37:00")})
 (defn create-account 
     [account]
-    (sql/insert! postgresql
-                 :accounts account))
+    (let [parsed-account (into account 
+                            {:createdat (timec/to-timestamp (timecore/now))}
+                            )]    
+        (sql/insert! postgresql
+                     :accounts parsed-account)))
            
 (defn get-all-accounts []
     (into [] 
@@ -95,11 +101,13 @@
 ; Transactions table
 ; ==
 
-; (db/create-transaction {:amount 100 :cdtransactiontype 1 :acc_to 1 :acc_from 2 :createdat (db/string-to-timestamp "2018-06-03 14:37:00")})
 (defn create-transaction 
     [transaction]
-    (sql/insert! postgresql
-                 :transactions transaction))
+    (let [parsed-transaction (into transaction 
+                              {:createdat (timec/to-timestamp (timecore/now))}
+                             )]      
+      (sql/insert! postgresql
+                   :transactions parsed-transaction)))
            
 (defn get-all-transactions []
     (into [] 

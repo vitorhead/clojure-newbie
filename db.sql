@@ -33,7 +33,7 @@ CREATE TABLE transactions (
     VALUES
         (1, 'deposit'),
         (2, 'withdraw'),
-        (3, 'transfer')
+        (3, 'transfer');
 */
 
 
